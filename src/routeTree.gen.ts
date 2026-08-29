@@ -10,33 +10,73 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CourtsRouteImport } from './routes/courts'
+import { Route as ManagerRouteImport } from './routes/manager'
+import { Route as MatchesRouteImport } from './routes/matches'
+import { Route as PlayersRouteImport } from './routes/players'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CourtsRoute = CourtsRouteImport.update({
+  id: '/courts',
+  path: '/courts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ManagerRoute = ManagerRouteImport.update({
+  id: '/manager',
+  path: '/manager',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MatchesRoute = MatchesRouteImport.update({
+  id: '/matches',
+  path: '/matches',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlayersRoute = PlayersRouteImport.update({
+  id: '/players',
+  path: '/players',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/courts': typeof CourtsRoute
+  '/manager': typeof ManagerRoute
+  '/matches': typeof MatchesRoute
+  '/players': typeof PlayersRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/courts': typeof CourtsRoute
+  '/manager': typeof ManagerRoute
+  '/matches': typeof MatchesRoute
+  '/players': typeof PlayersRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/courts': typeof CourtsRoute
+  '/manager': typeof ManagerRoute
+  '/matches': typeof MatchesRoute
+  '/players': typeof PlayersRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/courts' | '/manager' | '/matches' | '/players'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/courts' | '/manager' | '/matches' | '/players'
+  id: '__root__' | '/' | '/courts' | '/manager' | '/matches' | '/players'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CourtsRoute: typeof CourtsRoute
+  ManagerRoute: typeof ManagerRoute
+  MatchesRoute: typeof MatchesRoute
+  PlayersRoute: typeof PlayersRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +88,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/courts': {
+      id: '/courts'
+      path: '/courts'
+      fullPath: '/courts'
+      preLoaderRoute: typeof CourtsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/manager': {
+      id: '/manager'
+      path: '/manager'
+      fullPath: '/manager'
+      preLoaderRoute: typeof ManagerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/matches': {
+      id: '/matches'
+      path: '/matches'
+      fullPath: '/matches'
+      preLoaderRoute: typeof MatchesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/players': {
+      id: '/players'
+      path: '/players'
+      fullPath: '/players'
+      preLoaderRoute: typeof PlayersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CourtsRoute: CourtsRoute,
+  ManagerRoute: ManagerRoute,
+  MatchesRoute: MatchesRoute,
+  PlayersRoute: PlayersRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

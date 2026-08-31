@@ -14,16 +14,246 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      bookings: {
+        Row: {
+          court_id: string
+          created_at: string
+          ends_at: string
+          id: string
+          player_id: string
+          price_cents: number
+          starts_at: string
+          status: string
+        }
+        Insert: {
+          court_id: string
+          created_at?: string
+          ends_at: string
+          id?: string
+          player_id: string
+          price_cents?: number
+          starts_at: string
+          status?: string
+        }
+        Update: {
+          court_id?: string
+          created_at?: string
+          ends_at?: string
+          id?: string
+          player_id?: string
+          price_cents?: number
+          starts_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_court_id_fkey"
+            columns: ["court_id"]
+            isOneToOne: false
+            referencedRelation: "courts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clubs: {
+        Row: {
+          created_at: string
+          id: string
+          location_label: string
+          manager_id: string | null
+          name: string
+          price_cents: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          location_label?: string
+          manager_id?: string | null
+          name: string
+          price_cents?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          location_label?: string
+          manager_id?: string | null
+          name?: string
+          price_cents?: number
+        }
+        Relationships: []
+      }
+      court_blocks: {
+        Row: {
+          court_id: string
+          created_at: string
+          created_by: string | null
+          ends_at: string
+          id: string
+          reason: string
+          starts_at: string
+        }
+        Insert: {
+          court_id: string
+          created_at?: string
+          created_by?: string | null
+          ends_at: string
+          id?: string
+          reason?: string
+          starts_at: string
+        }
+        Update: {
+          court_id?: string
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string
+          id?: string
+          reason?: string
+          starts_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "court_blocks_court_id_fkey"
+            columns: ["court_id"]
+            isOneToOne: false
+            referencedRelation: "courts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      courts: {
+        Row: {
+          club_id: string
+          created_at: string
+          id: string
+          name: string
+          position: number
+        }
+        Insert: {
+          club_id: string
+          created_at?: string
+          id?: string
+          name: string
+          position?: number
+        }
+        Update: {
+          club_id?: string
+          created_at?: string
+          id?: string
+          name?: string
+          position?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "courts_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      matches: {
+        Row: {
+          club_label: string
+          created_at: string
+          id: string
+          level_delta: number
+          opponent: string
+          played_on: string
+          player_id: string
+          result: string
+          score: string
+        }
+        Insert: {
+          club_label?: string
+          created_at?: string
+          id?: string
+          level_delta?: number
+          opponent: string
+          played_on?: string
+          player_id: string
+          result: string
+          score: string
+        }
+        Update: {
+          club_label?: string
+          created_at?: string
+          id?: string
+          level_delta?: number
+          opponent?: string
+          played_on?: string
+          player_id?: string
+          result?: string
+          score?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string
+          id: string
+          initials: string
+          level: number
+          style: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string
+          id: string
+          initials?: string
+          level?: number
+          style?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string
+          id?: string
+          initials?: string
+          level?: number
+          style?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "player" | "club_manager"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +380,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["player", "club_manager"],
+    },
   },
 } as const

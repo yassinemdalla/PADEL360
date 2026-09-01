@@ -57,27 +57,42 @@ export type Database = {
       }
       clubs: {
         Row: {
+          address: string
           created_at: string
+          description: string
           id: string
+          latitude: number | null
           location_label: string
+          longitude: number | null
           manager_id: string | null
           name: string
+          photo_url: string | null
           price_cents: number
         }
         Insert: {
+          address?: string
           created_at?: string
+          description?: string
           id?: string
+          latitude?: number | null
           location_label?: string
+          longitude?: number | null
           manager_id?: string | null
           name: string
+          photo_url?: string | null
           price_cents?: number
         }
         Update: {
+          address?: string
           created_at?: string
+          description?: string
           id?: string
+          latitude?: number | null
           location_label?: string
+          longitude?: number | null
           manager_id?: string | null
           name?: string
+          photo_url?: string | null
           price_cents?: number
         }
         Relationships: []
@@ -124,23 +139,29 @@ export type Database = {
         Row: {
           club_id: string
           created_at: string
+          description: string
           id: string
           name: string
           position: number
+          surface: string
         }
         Insert: {
           club_id: string
           created_at?: string
+          description?: string
           id?: string
           name: string
           position?: number
+          surface?: string
         }
         Update: {
           club_id?: string
           created_at?: string
+          description?: string
           id?: string
           name?: string
           position?: number
+          surface?: string
         }
         Relationships: [
           {

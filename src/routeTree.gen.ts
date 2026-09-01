@@ -10,15 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
-import { Route as CourtsRouteImport } from './routes/courts'
-import { Route as ManagerRouteImport } from './routes/manager'
-import { Route as MatchesRouteImport } from './routes/matches'
-import { Route as PlayersRouteImport } from './routes/players'
+import { Route as AuthenticatedCourtsRouteImport } from './routes/_authenticated/courts'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -26,74 +28,41 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CourtsRoute = CourtsRouteImport.update({
+const AuthenticatedCourtsRoute = AuthenticatedCourtsRouteImport.update({
   id: '/courts',
   path: '/courts',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ManagerRoute = ManagerRouteImport.update({
-  id: '/manager',
-  path: '/manager',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MatchesRoute = MatchesRouteImport.update({
-  id: '/matches',
-  path: '/matches',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PlayersRoute = PlayersRouteImport.update({
-  id: '/players',
-  path: '/players',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/courts': typeof CourtsRoute
-  '/manager': typeof ManagerRoute
-  '/matches': typeof MatchesRoute
-  '/players': typeof PlayersRoute
+  '/courts': typeof AuthenticatedCourtsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/courts': typeof CourtsRoute
-  '/manager': typeof ManagerRoute
-  '/matches': typeof MatchesRoute
-  '/players': typeof PlayersRoute
+  '/courts': typeof AuthenticatedCourtsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
-  '/courts': typeof CourtsRoute
-  '/manager': typeof ManagerRoute
-  '/matches': typeof MatchesRoute
-  '/players': typeof PlayersRoute
+  '/_authenticated/courts': typeof AuthenticatedCourtsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/courts' | '/manager' | '/matches' | '/players'
+  fullPaths: '/' | '/auth' | '/courts'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/courts' | '/manager' | '/matches' | '/players'
-  id:
-    | '__root__'
-    | '/'
-    | '/auth'
-    | '/courts'
-    | '/manager'
-    | '/matches'
-    | '/players'
+  to: '/' | '/auth' | '/courts'
+  id: '__root__' | '/' | '/_authenticated' | '/auth' | '/_authenticated/courts'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
-  CourtsRoute: typeof CourtsRoute
-  ManagerRoute: typeof ManagerRoute
-  MatchesRoute: typeof MatchesRoute
-  PlayersRoute: typeof PlayersRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -105,6 +74,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -112,44 +88,31 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/courts': {
-      id: '/courts'
+    '/_authenticated/courts': {
+      id: '/_authenticated/courts'
       path: '/courts'
       fullPath: '/courts'
-      preLoaderRoute: typeof CourtsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/manager': {
-      id: '/manager'
-      path: '/manager'
-      fullPath: '/manager'
-      preLoaderRoute: typeof ManagerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/matches': {
-      id: '/matches'
-      path: '/matches'
-      fullPath: '/matches'
-      preLoaderRoute: typeof MatchesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/players': {
-      id: '/players'
-      path: '/players'
-      fullPath: '/players'
-      preLoaderRoute: typeof PlayersRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedCourtsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedCourtsRoute: typeof AuthenticatedCourtsRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedCourtsRoute: AuthenticatedCourtsRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
-  CourtsRoute: CourtsRoute,
-  ManagerRoute: ManagerRoute,
-  MatchesRoute: MatchesRoute,
-  PlayersRoute: PlayersRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

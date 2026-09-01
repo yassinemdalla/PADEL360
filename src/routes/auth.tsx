@@ -45,7 +45,7 @@ function AuthPage() {
 
   async function afterAuth() {
     const session = await queryClient.fetchQuery({ queryKey: sessionQueryKey, queryFn: fetchSession });
-    await navigate({ to: session?.role === "club_manager" ? "/manager" : "/dashboard" });
+    await navigate({ to: session?.role === "club_manager" ? "/manager" : "/" });
   }
 
   async function onSubmit(e: React.FormEvent) {

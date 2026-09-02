@@ -11,12 +11,12 @@ import { useMyClub } from "@/lib/padel";
 export const Route = createFileRoute("/_authenticated/club")({
   head: () => ({
     meta: [
-      { title: "Edit Your Club Profile — PadelBase Manager" },
+      { title: "Edit Your Club Profile — PADEL360 Manager" },
       {
         name: "description",
         content: "Update your padel club details, photo, address and court descriptions so players see the right info when booking.",
       },
-      { property: "og:title", content: "Edit Your Club Profile — PadelBase Manager" },
+      { property: "og:title", content: "Edit Your Club Profile — PADEL360 Manager" },
       { property: "og:description", content: "Club details, photos and court descriptions for your padel club." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

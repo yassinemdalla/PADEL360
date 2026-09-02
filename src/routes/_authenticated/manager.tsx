@@ -9,12 +9,12 @@ import { HOURS, euros, formatHour, slotEnd, slotStart, todayLabel } from "@/lib/
 export const Route = createFileRoute("/_authenticated/manager")({
   head: () => ({
     meta: [
-      { title: "Club Schedule & Bookings — PadelBase Manager" },
+      { title: "Club Schedule & Bookings — PADEL360 Manager" },
       {
         name: "description",
         content: "Manage your padel club: see the day's court schedule, live bookings, manager holds and occupancy at a glance.",
       },
-      { property: "og:title", content: "Club Schedule & Bookings — PadelBase Manager" },
+      { property: "og:title", content: "Club Schedule & Bookings — PADEL360 Manager" },
       { property: "og:description", content: "Court schedule, bookings and occupancy for your padel club." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

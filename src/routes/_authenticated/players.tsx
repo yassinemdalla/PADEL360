@@ -9,12 +9,12 @@ import { usePlayers } from "@/lib/padel";
 export const Route = createFileRoute("/_authenticated/players")({
   head: () => ({
     meta: [
-      { title: "Find Padel Players At Your Level — PadelBase" },
+      { title: "Find Padel Players At Your Level — PADEL360" },
       {
         name: "description",
         content: "Browse padel players by level and playing style, then connect with the ones who match your game.",
       },
-      { property: "og:title", content: "Find Padel Players At Your Level — PadelBase" },
+      { property: "og:title", content: "Find Padel Players At Your Level — PADEL360" },
       { property: "og:description", content: "Discover and connect with players who match your padel level." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

@@ -37,7 +37,7 @@ export function SiteHeader() {
           <div className="size-9 bg-court grid place-items-center">
             <span className="font-display font-black text-ink text-lg">P</span>
           </div>
-          <span className="font-display font-black text-xl tracking-tight uppercase">PadelBase</span>
+          <span className="font-display font-black text-xl tracking-tight uppercase">PADEL360</span>
         </Link>
 
         {session && (

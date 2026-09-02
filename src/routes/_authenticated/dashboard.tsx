@@ -12,12 +12,12 @@ import { euros } from "@/lib/slots";
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
-      { title: "Your Padel Dashboard — PadelBase" },
+      { title: "Your Padel Dashboard — PADEL360" },
       {
         name: "description",
         content: "Your padel profile, level progress, upcoming court bookings and latest match results in one place.",
       },
-      { property: "og:title", content: "Your Padel Dashboard — PadelBase" },
+      { property: "og:title", content: "Your Padel Dashboard — PADEL360" },
       { property: "og:description", content: "Level progress, bookings and match results at a glance." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

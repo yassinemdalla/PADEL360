@@ -5,13 +5,13 @@ import { SiteFooter } from "@/components/SiteFooter";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "PadelBase — Find the game, track the growth" },
+      { title: "PADEL360 — Find the game, track the growth" },
       {
         name: "description",
         content:
           "Track padel matches, watch your level climb, meet players at your skill level and book courts at nearby clubs.",
       },
-      { property: "og:title", content: "PadelBase — Find the game, track the growth" },
+      { property: "og:title", content: "PADEL360 — Find the game, track the growth" },
       {
         property: "og:description",
         content: "The full padel ecosystem: match history, level progression, player discovery and court booking.",
@@ -62,7 +62,7 @@ function Index() {
             <span className="text-clay">Growth.</span>
           </h1>
           <p className="mt-6 max-w-md font-mono text-sm text-sand/70 leading-relaxed">
-            PadelBase is the full court ecosystem — discover players at your level, book nearby
+            PADEL360 is the full court ecosystem — discover players at your level, book nearby
             courts, and watch your padel level climb, match by match.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">

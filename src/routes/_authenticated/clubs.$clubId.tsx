@@ -7,12 +7,12 @@ import { euros } from "@/lib/slots";
 export const Route = createFileRoute("/_authenticated/clubs/$clubId")({
   head: () => ({
     meta: [
-      { title: "Padel Club Profile — PadelBase" },
+      { title: "Padel Club Profile — PADEL360" },
       {
         name: "description",
         content: "Club details, courts, surfaces and hourly pricing for this padel club, plus a direct link to book a slot.",
       },
-      { property: "og:title", content: "Padel Club Profile — PadelBase" },
+      { property: "og:title", content: "Padel Club Profile — PADEL360" },
       { property: "og:description", content: "Courts, surfaces and pricing for this padel club." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

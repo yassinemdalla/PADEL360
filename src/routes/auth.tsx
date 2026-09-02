@@ -10,13 +10,13 @@ import { sessionQueryKey, fetchSession } from "@/lib/auth";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in to PadelBase — Players & Club Managers" },
+      { title: "Sign in to PADEL360 — Players & Club Managers" },
       {
         name: "description",
         content:
-          "Sign in or create a PadelBase account as a player or club manager to track matches and manage courts.",
+          "Sign in or create a PADEL360 account as a player or club manager to track matches and manage courts.",
       },
-      { property: "og:title", content: "Sign in to PadelBase" },
+      { property: "og:title", content: "Sign in to PADEL360" },
       { property: "og:description", content: "One account for padel players and club managers." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -110,7 +110,7 @@ function AuthPage() {
             <div className="size-9 bg-court grid place-items-center">
               <span className="font-display font-black text-ink text-lg">P</span>
             </div>
-            <span className="font-display font-black text-xl tracking-tight uppercase">PadelBase</span>
+            <span className="font-display font-black text-xl tracking-tight uppercase">PADEL360</span>
           </Link>
         </div>
       </header>

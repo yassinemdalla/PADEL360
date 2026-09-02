@@ -7,12 +7,12 @@ import { useMyMatches } from "@/lib/padel";
 export const Route = createFileRoute("/_authenticated/matches")({
   head: () => ({
     meta: [
-      { title: "Match History & Level Progression — PadelBase" },
+      { title: "Match History & Level Progression — PADEL360" },
       {
         name: "description",
         content: "Every padel match you have played, with scores, opponents, clubs and the level change each result earned.",
       },
-      { property: "og:title", content: "Match History & Level Progression — PadelBase" },
+      { property: "og:title", content: "Match History & Level Progression — PADEL360" },
       { property: "og:description", content: "Scores, opponents and level deltas for every match you play." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

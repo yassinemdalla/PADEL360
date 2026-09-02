@@ -104,3 +104,64 @@ export const cancelBooking = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+const logMatchSchema = z.object({
+  bookingId: z.string().uuid(),
+  opponent: z.string().trim().min(2).max(60),
+  score: z.string().trim().min(3).max(30),
+  result: z.enum(["WIN", "LOSS"]),
+});
+
+/** Turn a finished booking into a match result and nudge the player's level. */
+export const logMatchFromBooking = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => logMatchSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+
+    const { data: booking, error: bookingError } = await supabase
+      .from("bookings")
+      .select("id, player_id, starts_at, ends_at, status, courts(name, clubs(name))")
+      .eq("id", data.bookingId)
+      .maybeSingle();
+
+    if (bookingError) throw new Error(bookingError.message);
+    if (!booking || booking.player_id !== userId) throw new Error("Booking not found.");
+    if (booking.status === "cancelled") throw new Error("That booking was cancelled.");
+    if (new Date(booking.ends_at).getTime() > Date.now()) {
+      throw new Error("You can log the result once the match has finished.");
+    }
+
+    const court = booking.courts as unknown as { name: string; clubs: { name: string } | null } | null;
+    const clubLabel = court?.clubs?.name ?? "Padel club";
+    const levelDelta = data.result === "WIN" ? 0.05 : -0.03;
+
+    const { data: match, error } = await supabase
+      .from("matches")
+      .insert({
+        player_id: userId,
+        played_on: booking.starts_at.slice(0, 10),
+        opponent: data.opponent,
+        score: data.score,
+        result: data.result,
+        club_label: clubLabel,
+        level_delta: levelDelta,
+      })
+      .select("id")
+      .single();
+
+    if (error) throw new Error(error.message);
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("level")
+      .eq("id", userId)
+      .maybeSingle();
+
+    if (profile) {
+      const next = Math.min(7, Math.max(1, Number(profile.level) + levelDelta));
+      await supabase.from("profiles").update({ level: Number(next.toFixed(2)) }).eq("id", userId);
+    }
+
+    return { id: match.id, levelDelta };
+  });

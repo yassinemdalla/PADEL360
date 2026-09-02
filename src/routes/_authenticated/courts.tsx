@@ -15,12 +15,12 @@ const ClubMap = lazy(() => import("@/components/ClubMap"));
 export const Route = createFileRoute("/_authenticated/courts")({
   head: () => ({
     meta: [
-      { title: "Book a Padel Court Nearby — PadelBase" },
+      { title: "Book a Padel Court Nearby — PADEL360" },
       {
         name: "description",
         content: "See live court availability on the map at nearby padel clubs and reserve your slot in a couple of taps.",
       },
-      { property: "og:title", content: "Book a Padel Court Nearby — PadelBase" },
+      { property: "og:title", content: "Book a Padel Court Nearby — PADEL360" },
       { property: "og:description", content: "Live availability and instant booking at padel clubs near you." },
     ],
   }),

@@ -2,6 +2,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/lib/auth";
+import { Padel360Logo } from "@/components/Padel360Logo";
 
 const playerLinks = [
   { to: "/dashboard", label: "Dashboard" },

@@ -13,6 +13,9 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedCourtsRouteImport } from './routes/_authenticated/courts'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedMatchesRouteImport } from './routes/_authenticated/matches'
+import { Route as AuthenticatedPlayersRouteImport } from './routes/_authenticated/players'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -33,16 +36,37 @@ const AuthenticatedCourtsRoute = AuthenticatedCourtsRouteImport.update({
   path: '/courts',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMatchesRoute = AuthenticatedMatchesRouteImport.update({
+  id: '/matches',
+  path: '/matches',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPlayersRoute = AuthenticatedPlayersRouteImport.update({
+  id: '/players',
+  path: '/players',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/courts': typeof AuthenticatedCourtsRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/matches': typeof AuthenticatedMatchesRoute
+  '/players': typeof AuthenticatedPlayersRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/courts': typeof AuthenticatedCourtsRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/matches': typeof AuthenticatedMatchesRoute
+  '/players': typeof AuthenticatedPlayersRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -50,13 +74,24 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/courts': typeof AuthenticatedCourtsRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/matches': typeof AuthenticatedMatchesRoute
+  '/_authenticated/players': typeof AuthenticatedPlayersRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/courts'
+  fullPaths: '/' | '/auth' | '/courts' | '/dashboard' | '/matches' | '/players'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/courts'
-  id: '__root__' | '/' | '/_authenticated' | '/auth' | '/_authenticated/courts'
+  to: '/' | '/auth' | '/courts' | '/dashboard' | '/matches' | '/players'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/courts'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/matches'
+    | '/_authenticated/players'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -95,15 +130,42 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCourtsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/matches': {
+      id: '/_authenticated/matches'
+      path: '/matches'
+      fullPath: '/matches'
+      preLoaderRoute: typeof AuthenticatedMatchesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/players': {
+      id: '/_authenticated/players'
+      path: '/players'
+      fullPath: '/players'
+      preLoaderRoute: typeof AuthenticatedPlayersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedCourtsRoute: typeof AuthenticatedCourtsRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedMatchesRoute: typeof AuthenticatedMatchesRoute
+  AuthenticatedPlayersRoute: typeof AuthenticatedPlayersRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCourtsRoute: AuthenticatedCourtsRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedMatchesRoute: AuthenticatedMatchesRoute,
+  AuthenticatedPlayersRoute: AuthenticatedPlayersRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

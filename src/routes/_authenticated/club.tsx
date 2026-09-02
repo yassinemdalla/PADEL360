@@ -67,9 +67,9 @@ function ClubProfilePage() {
         .update({
           name: form.name,
           location_label: form.location_label,
-          address: form.address || null,
-          description: form.description || null,
-          photo_url: form.photo_url || null,
+          address: form.address,
+          description: form.description,
+          photo_url: form.photo_url,
           price_cents: form.price_cents,
         })
         .eq("id", club.id);
@@ -80,7 +80,7 @@ function ClubProfilePage() {
         if (!fields) continue;
         const { error: courtError } = await supabase
           .from("courts")
-          .update({ description: fields.description || null, surface: fields.surface || null })
+          .update({ description: fields.description, surface: fields.surface })
           .eq("id", court.id);
         if (courtError) throw new Error(courtError.message);
       }

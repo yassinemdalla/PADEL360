@@ -34,9 +34,7 @@ export function SiteHeader() {
     <header className="bg-ink text-sand border-b-4 border-court">
       <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
         <Link to={session ? (session.role === "club_manager" ? "/manager" : "/dashboard") : "/"} className="flex items-center gap-3">
-          <div className="size-9 bg-court grid place-items-center">
-            <span className="font-display font-black text-ink text-lg">P</span>
-          </div>
+          <Padel360Logo />
           <span className="font-display font-black text-xl tracking-tight uppercase">PADEL360</span>
         </Link>
 

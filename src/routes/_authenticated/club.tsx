@@ -229,6 +229,10 @@ function ClubProfilePage() {
             </button>
           </form>
         )}
+
+        {club && <ManagerReviews courts={club.courts} />}
+
+        )}
       </main>
 
       <SiteFooter />

@@ -232,7 +232,6 @@ function ClubProfilePage() {
 
         {club && <ManagerReviews courts={club.courts} />}
 
-        )}
       </main>
 
       <SiteFooter />

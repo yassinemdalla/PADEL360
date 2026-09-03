@@ -66,14 +66,23 @@ function ClubDetailPage() {
             <div className="mt-8 slab-thick bg-sand">
               <div className="bg-ink text-sand px-5 py-3 font-mono text-xs uppercase tracking-widest">Courts</div>
               <ul>
-                {club.courts.map((court) => (
-                  <li key={court.id} className="border-t-2 border-ink px-5 py-4">
-                    <div className="font-display font-black text-xl leading-none">{court.name}</div>
-                    <div className="font-mono text-xs text-ink/60 mt-1">
-                      {[court.surface, court.description].filter(Boolean).join(" · ") || "Padel court"}
-                    </div>
-                  </li>
-                ))}
+                {club.courts.map((court) => {
+                  const courtReviews = reviews.filter((r) => r.court_id === court.id);
+                  return (
+                    <li key={court.id} className="border-t-2 border-ink px-5 py-4">
+                      <div className="font-display font-black text-xl leading-none">{court.name}</div>
+                      <div className="font-mono text-xs text-ink/60 mt-1">
+                        {[court.surface, court.description].filter(Boolean).join(" · ") || "Padel court"}
+                      </div>
+                      <CourtReviewPanel
+                        courtId={court.id}
+                        reviews={courtReviews}
+                        mine={courtReviews.find((r) => r.player_id === session?.userId)}
+                      />
+                    </li>
+                  );
+                })}
+
               </ul>
             </div>
 

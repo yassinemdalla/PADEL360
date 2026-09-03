@@ -1,8 +1,11 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
-import { useClub } from "@/lib/padel";
+import { CourtReviewPanel } from "@/components/CourtReviews";
+import { useSession } from "@/lib/auth";
+import { useClub, useCourtReviews } from "@/lib/padel";
 import { euros } from "@/lib/slots";
+
 
 export const Route = createFileRoute("/_authenticated/clubs/$clubId")({
   head: () => ({

@@ -1,8 +1,11 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
-import { useClub } from "@/lib/padel";
+import { CourtReviewPanel } from "@/components/CourtReviews";
+import { useSession } from "@/lib/auth";
+import { useClub, useCourtReviews } from "@/lib/padel";
 import { euros } from "@/lib/slots";
+
 
 export const Route = createFileRoute("/_authenticated/clubs/$clubId")({
   head: () => ({
@@ -24,6 +27,9 @@ export const Route = createFileRoute("/_authenticated/clubs/$clubId")({
 function ClubDetailPage() {
   const { clubId } = useParams({ from: "/_authenticated/clubs/$clubId" });
   const { data: club, isLoading } = useClub(clubId);
+  const { data: session } = useSession();
+  const { data: reviews = [] } = useCourtReviews((club?.courts ?? []).map((c) => c.id));
+
 
   return (
     <div className="min-h-screen w-full bg-sand text-ink flex flex-col">
@@ -60,14 +66,23 @@ function ClubDetailPage() {
             <div className="mt-8 slab-thick bg-sand">
               <div className="bg-ink text-sand px-5 py-3 font-mono text-xs uppercase tracking-widest">Courts</div>
               <ul>
-                {club.courts.map((court) => (
-                  <li key={court.id} className="border-t-2 border-ink px-5 py-4">
-                    <div className="font-display font-black text-xl leading-none">{court.name}</div>
-                    <div className="font-mono text-xs text-ink/60 mt-1">
-                      {[court.surface, court.description].filter(Boolean).join(" · ") || "Padel court"}
-                    </div>
-                  </li>
-                ))}
+                {club.courts.map((court) => {
+                  const courtReviews = reviews.filter((r) => r.court_id === court.id);
+                  return (
+                    <li key={court.id} className="border-t-2 border-ink px-5 py-4">
+                      <div className="font-display font-black text-xl leading-none">{court.name}</div>
+                      <div className="font-mono text-xs text-ink/60 mt-1">
+                        {[court.surface, court.description].filter(Boolean).join(" · ") || "Padel court"}
+                      </div>
+                      <CourtReviewPanel
+                        courtId={court.id}
+                        reviews={courtReviews}
+                        mine={courtReviews.find((r) => r.player_id === session?.userId)}
+                      />
+                    </li>
+                  );
+                })}
+
               </ul>
             </div>
 

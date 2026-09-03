@@ -6,7 +6,8 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/lib/auth";
-import { useMyClub } from "@/lib/padel";
+import { useMyClub, useCourtReviews } from "@/lib/padel";
+import { RatingBar, average } from "@/components/CourtReviews";
 
 export const Route = createFileRoute("/_authenticated/club")({
   head: () => ({
@@ -236,5 +237,44 @@ function ClubProfilePage() {
 
       <SiteFooter />
     </div>
+  );
+}
+
+/** Read-only view of what players said about each court. */
+function ManagerReviews({ courts }: { courts: { id: string; name: string }[] }) {
+  const { data: reviews = [] } = useCourtReviews(courts.map((c) => c.id));
+
+  return (
+    <section className="mt-10">
+      <h2 className="font-display font-black uppercase tracking-tighter text-3xl leading-none mb-4">
+        Player reviews
+      </h2>
+      <div className="space-y-4">
+        {courts.map((court) => {
+          const list = reviews.filter((r) => r.court_id === court.id);
+          return (
+            <div key={court.id} className="slab p-4 bg-sand">
+              <div className="font-display font-black text-xl leading-none">{court.name}</div>
+              <div className="grid sm:grid-cols-3 gap-3 mt-3">
+                <RatingBar label="Surface" value={average(list, "surface_rating")} />
+                <RatingBar label="Lighting" value={average(list, "lighting_rating")} />
+                <RatingBar label="Crowd" value={average(list, "crowd_rating")} />
+              </div>
+              {list.length === 0 ? (
+                <div className="mt-3 font-mono text-xs text-ink/50">No reviews yet.</div>
+              ) : (
+                list.map((r) => (
+                  <div key={r.id} className="mt-2 font-mono text-xs text-ink/70">
+                    <span className="font-bold">{r.profiles?.display_name ?? "Player"}</span> · S{r.surface_rating} L
+                    {r.lighting_rating} C{r.crowd_rating}
+                    {r.comment ? ` — ${r.comment}` : ""}
+                  </div>
+                ))
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </section>
   );
 }

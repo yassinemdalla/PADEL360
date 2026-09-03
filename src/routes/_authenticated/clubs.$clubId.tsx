@@ -27,6 +27,9 @@ export const Route = createFileRoute("/_authenticated/clubs/$clubId")({
 function ClubDetailPage() {
   const { clubId } = useParams({ from: "/_authenticated/clubs/$clubId" });
   const { data: club, isLoading } = useClub(clubId);
+  const { data: session } = useSession();
+  const { data: reviews = [] } = useCourtReviews((club?.courts ?? []).map((c) => c.id));
+
 
   return (
     <div className="min-h-screen w-full bg-sand text-ink flex flex-col">

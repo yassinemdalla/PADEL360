@@ -196,3 +196,125 @@ export function usePlayers(excludeUserId: string | undefined) {
     },
   });
 }
+
+export type CourtReview = {
+  id: string;
+  court_id: string;
+  player_id: string;
+  surface_rating: number;
+  lighting_rating: number;
+  crowd_rating: number;
+  comment: string;
+  created_at: string;
+  profiles: { display_name: string; initials: string } | null;
+};
+
+/** Reviews for a set of courts (club profile + manager view). */
+export function useCourtReviews(courtIds: string[]) {
+  const key = [...courtIds].sort().join(",");
+  return useQuery({
+    enabled: courtIds.length > 0,
+    queryKey: ["court-reviews", key],
+    queryFn: async (): Promise<CourtReview[]> => {
+      const { data, error } = await supabase
+        .from("court_reviews")
+        .select(
+          "id, court_id, player_id, surface_rating, lighting_rating, crowd_rating, comment, created_at, profiles(display_name, initials)",
+        )
+        .in("court_id", courtIds)
+        .order("created_at", { ascending: false });
+      if (error) throw new Error(error.message);
+      return (data ?? []) as unknown as CourtReview[];
+    },
+  });
+}
+
+export type BookingInvite = {
+  id: string;
+  booking_id: string;
+  inviter_id: string;
+  invitee_id: string;
+  status: string;
+  bookings: {
+    id: string;
+    starts_at: string;
+    ends_at: string;
+    courts: { name: string; clubs: { name: string; location_label: string } | null } | null;
+  } | null;
+};
+
+const INVITE_SELECT =
+  "id, booking_id, inviter_id, invitee_id, status, bookings(id, starts_at, ends_at, courts(name, clubs(name, location_label)))";
+
+/** Invites the signed-in player received. */
+export function useInvitesReceived(userId: string | undefined) {
+  return useQuery({
+    enabled: Boolean(userId),
+    queryKey: ["invites-received", userId],
+    queryFn: async (): Promise<BookingInvite[]> => {
+      const { data, error } = await supabase
+        .from("booking_invites")
+        .select(INVITE_SELECT)
+        .eq("invitee_id", userId!)
+        .order("created_at", { ascending: false });
+      if (error) throw new Error(error.message);
+      return (data ?? []) as unknown as BookingInvite[];
+    },
+  });
+}
+
+/** Invites the signed-in player sent, for their own bookings. */
+export function useInvitesSent(userId: string | undefined) {
+  return useQuery({
+    enabled: Boolean(userId),
+    queryKey: ["invites-sent", userId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("booking_invites")
+        .select("id, booking_id, invitee_id, status, profiles:invitee_id(display_name, initials)")
+        .eq("inviter_id", userId!);
+      if (error) throw new Error(error.message);
+      return (data ?? []) as unknown as {
+        id: string;
+        booking_id: string;
+        invitee_id: string;
+        status: string;
+        profiles: { display_name: string; initials: string } | null;
+      }[];
+    },
+  });
+}
+
+/** A single player's public profile. */
+export function usePlayer(playerId: string | undefined) {
+  return useQuery({
+    enabled: Boolean(playerId),
+    queryKey: ["player", playerId],
+    queryFn: async (): Promise<PlayerProfile | null> => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, display_name, initials, level, style, avatar_url")
+        .eq("id", playerId!)
+        .maybeSingle();
+      if (error) throw new Error(error.message);
+      return data ? { ...data, level: Number(data.level) } : null;
+    },
+  });
+}
+
+/** Public match history for any player. */
+export function usePlayerMatches(playerId: string | undefined) {
+  return useQuery({
+    enabled: Boolean(playerId),
+    queryKey: ["player-matches", playerId],
+    queryFn: async (): Promise<Match[]> => {
+      const { data, error } = await supabase
+        .from("matches")
+        .select("id, played_on, opponent, score, result, club_label, level_delta")
+        .eq("player_id", playerId!)
+        .order("played_on", { ascending: false });
+      if (error) throw new Error(error.message);
+      return (data ?? []).map((m) => ({ ...m, level_delta: Number(m.level_delta) }));
+    },
+  });
+}

@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { dayBounds } from "./slots";
+import type { LevelTier } from "./levels";
 
 export type Court = {
   id: string;
@@ -9,14 +10,18 @@ export type Court = {
   position: number;
   description: string;
   surface: string;
+  court_type: string;
+  price_per_hour_cents: number;
+  open_from: number;
+  open_to: number;
 };
 
 export type Club = {
   id: string;
   name: string;
+  city: string;
   location_label: string;
   price_cents: number;
-  manager_id: string | null;
   description: string | null;
   photo_url: string | null;
   address: string | null;
@@ -25,8 +30,10 @@ export type Club = {
   courts: Court[];
 };
 
-const CLUB_SELECT =
-  "id, name, location_label, price_cents, manager_id, description, photo_url, address, latitude, longitude, courts(id, club_id, name, position, description, surface)";
+const COURT_FIELDS =
+  "id, club_id, name, position, description, surface, court_type, price_per_hour_cents, open_from, open_to";
+
+const CLUB_SELECT = `id, name, city, location_label, price_cents, description, photo_url, address, latitude, longitude, courts(${COURT_FIELDS})`;
 
 function sortCourts(club: Club): Club {
   return { ...club, courts: [...(club.courts ?? [])].sort((a, b) => a.position - b.position) };
@@ -55,52 +62,31 @@ export function useClub(clubId: string | undefined) {
   });
 }
 
-export function useMyClub(userId: string | undefined) {
-  return useQuery({
-    enabled: Boolean(userId),
-    queryKey: ["my-club", userId],
-    queryFn: async (): Promise<Club | null> => {
-      const { data, error } = await supabase
-        .from("clubs")
-        .select(CLUB_SELECT)
-        .eq("manager_id", userId!)
-        .maybeSingle();
-      if (error) throw new Error(error.message);
-      return data ? sortCourts(data as unknown as Club) : null;
-    },
-  });
-}
-
-export type Occupancy = {
-  bookings: { id: string; court_id: string; starts_at: string; ends_at: string; player_id: string; status: string; price_cents: number }[];
-  blocks: { id: string; court_id: string; starts_at: string; ends_at: string; reason: string }[];
+export type DayBooking = {
+  id: string;
+  court_id: string;
+  starts_at: string;
+  ends_at: string;
+  player_id: string;
+  status: string;
 };
 
-/** Bookings + manager holds for a set of courts on a single day. */
-export function useDayOccupancy(courtIds: string[], day: Date) {
+/** Confirmed bookings for a set of courts on a single day. */
+export function useDayBookings(courtIds: string[], day: Date) {
   const { from, to } = dayBounds(day);
   return useQuery({
     enabled: courtIds.length > 0,
-    queryKey: ["occupancy", courtIds.join(","), from.toISOString()],
-    queryFn: async (): Promise<Occupancy> => {
-      const [bookings, blocks] = await Promise.all([
-        supabase
-          .from("bookings")
-          .select("id, court_id, starts_at, ends_at, player_id, status, price_cents")
-          .in("court_id", courtIds)
-          .neq("status", "cancelled")
-          .gte("starts_at", from.toISOString())
-          .lt("starts_at", to.toISOString()),
-        supabase
-          .from("court_blocks")
-          .select("id, court_id, starts_at, ends_at, reason")
-          .in("court_id", courtIds)
-          .gte("starts_at", from.toISOString())
-          .lt("starts_at", to.toISOString()),
-      ]);
-      if (bookings.error) throw new Error(bookings.error.message);
-      if (blocks.error) throw new Error(blocks.error.message);
-      return { bookings: bookings.data ?? [], blocks: blocks.data ?? [] };
+    queryKey: ["day-bookings", [...courtIds].sort().join(","), from.toISOString()],
+    queryFn: async (): Promise<DayBooking[]> => {
+      const { data, error } = await supabase
+        .from("bookings")
+        .select("id, court_id, starts_at, ends_at, player_id, status")
+        .in("court_id", courtIds)
+        .neq("status", "cancelled")
+        .gte("starts_at", from.toISOString())
+        .lt("starts_at", to.toISOString());
+      if (error) throw new Error(error.message);
+      return (data ?? []) as DayBooking[];
     },
   });
 }
@@ -111,8 +97,11 @@ export type MyBooking = {
   ends_at: string;
   status: string;
   price_cents: number;
-  courts: { id: string; name: string; clubs: { id: string; name: string; location_label: string } | null } | null;
+  courts: { id: string; name: string; court_type: string; clubs: { id: string; name: string; city: string } | null } | null;
 };
+
+const BOOKING_SELECT =
+  "id, starts_at, ends_at, status, price_cents, courts(id, name, court_type, clubs(id, name, city))";
 
 export function useMyBookings(userId: string | undefined) {
   return useQuery({
@@ -121,7 +110,7 @@ export function useMyBookings(userId: string | undefined) {
     queryFn: async (): Promise<MyBooking[]> => {
       const { data, error } = await supabase
         .from("bookings")
-        .select("id, starts_at, ends_at, status, price_cents, courts(id, name, clubs(id, name, location_label))")
+        .select(BOOKING_SELECT)
         .eq("player_id", userId!)
         .order("starts_at", { ascending: false });
       if (error) throw new Error(error.message);
@@ -130,44 +119,89 @@ export function useMyBookings(userId: string | undefined) {
   });
 }
 
-export function useBooking(bookingId: string | undefined) {
+export type MatchPlayer = {
+  id: string;
+  match_id: string;
+  player_id: string;
+  status: string;
+  side: number | null;
+};
+
+export type MatchResult = {
+  winner_side: number;
+  score_text: string;
+  recorded_by: string;
+  recorded_at: string;
+};
+
+export type MatchRow = {
+  id: string;
+  creator_id: string;
+  club_id: string;
+  court_id: string | null;
+  booking_id: string | null;
+  starts_at: string;
+  ends_at: string;
+  level_required: LevelTier;
+  max_players: number;
+  is_public: boolean;
+  notes: string;
+  clubs: { id: string; name: string; city: string; address: string | null } | null;
+  courts: { id: string; name: string; court_type: string } | null;
+  match_players: MatchPlayer[];
+  match_results: MatchResult[];
+};
+
+const MATCH_SELECT =
+  "id, creator_id, club_id, court_id, booking_id, starts_at, ends_at, level_required, max_players, is_public, notes, clubs(id, name, city, address), courts(id, name, court_type), match_players(id, match_id, player_id, status, side), match_results(winner_side, score_text, recorded_by, recorded_at)";
+
+/** All matches, newest first — filtering happens in the UI. */
+export function useMatches() {
   return useQuery({
-    enabled: Boolean(bookingId),
-    queryKey: ["booking", bookingId],
-    queryFn: async (): Promise<MyBooking | null> => {
+    queryKey: ["matches"],
+    queryFn: async (): Promise<MatchRow[]> => {
       const { data, error } = await supabase
-        .from("bookings")
-        .select("id, starts_at, ends_at, status, price_cents, courts(id, name, clubs(id, name, location_label))")
-        .eq("id", bookingId!)
-        .maybeSingle();
+        .from("matches")
+        .select(MATCH_SELECT)
+        .order("starts_at", { ascending: true });
       if (error) throw new Error(error.message);
-      return (data ?? null) as unknown as MyBooking | null;
+      return (data ?? []) as unknown as MatchRow[];
     },
   });
 }
 
-export type Match = {
-  id: string;
-  played_on: string;
-  opponent: string;
-  score: string;
-  result: string;
-  club_label: string;
-  level_delta: number;
-};
+export function useMatch(matchId: string | undefined) {
+  return useQuery({
+    enabled: Boolean(matchId),
+    queryKey: ["match", matchId],
+    queryFn: async (): Promise<MatchRow | null> => {
+      const { data, error } = await supabase.from("matches").select(MATCH_SELECT).eq("id", matchId!).maybeSingle();
+      if (error) throw new Error(error.message);
+      return (data ?? null) as unknown as MatchRow | null;
+    },
+  });
+}
 
+/** Matches the signed-in player created or joined. */
 export function useMyMatches(userId: string | undefined) {
   return useQuery({
     enabled: Boolean(userId),
     queryKey: ["my-matches", userId],
-    queryFn: async (): Promise<Match[]> => {
+    queryFn: async (): Promise<MatchRow[]> => {
+      const { data: mine, error: mineError } = await supabase
+        .from("match_players")
+        .select("match_id")
+        .eq("player_id", userId!);
+      if (mineError) throw new Error(mineError.message);
+      const ids = (mine ?? []).map((m) => m.match_id);
+      if (ids.length === 0) return [];
       const { data, error } = await supabase
         .from("matches")
-        .select("id, played_on, opponent, score, result, club_label, level_delta")
-        .eq("player_id", userId!)
-        .order("played_on", { ascending: false });
+        .select(MATCH_SELECT)
+        .in("id", ids)
+        .order("starts_at", { ascending: false });
       if (error) throw new Error(error.message);
-      return (data ?? []).map((m) => ({ ...m, level_delta: Number(m.level_delta) }));
+      return (data ?? []) as unknown as MatchRow[];
     },
   });
 }
@@ -176,145 +210,81 @@ export type PlayerProfile = {
   id: string;
   display_name: string;
   initials: string;
-  level: number;
-  style: string;
+  city: string;
+  level_tier: LevelTier;
+  level_points: number;
   avatar_url: string | null;
 };
 
-export function usePlayers(excludeUserId: string | undefined) {
+const PROFILE_SELECT = "id, display_name, initials, city, level_tier, level_points, avatar_url";
+
+export function useProfiles(ids: string[]) {
+  const key = [...new Set(ids)].sort().join(",");
   return useQuery({
-    queryKey: ["players"],
-    queryFn: async (): Promise<PlayerProfile[]> => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("id, display_name, initials, level, style, avatar_url")
-        .order("display_name");
+    enabled: ids.length > 0,
+    queryKey: ["profiles", key],
+    queryFn: async (): Promise<Record<string, PlayerProfile>> => {
+      const { data, error } = await supabase.from("profiles").select(PROFILE_SELECT).in("id", [...new Set(ids)]);
       if (error) throw new Error(error.message);
-      return (data ?? [])
-        .map((p) => ({ ...p, level: Number(p.level) }))
-        .filter((p) => p.id !== excludeUserId);
+      const map: Record<string, PlayerProfile> = {};
+      for (const p of (data ?? []) as unknown as PlayerProfile[]) map[p.id] = p;
+      return map;
     },
   });
 }
 
-export type CourtReview = {
-  id: string;
-  court_id: string;
-  player_id: string;
-  surface_rating: number;
-  lighting_rating: number;
-  crowd_rating: number;
-  comment: string;
-  created_at: string;
-  profiles: { display_name: string; initials: string } | null;
-};
-
-/** Reviews for a set of courts (club profile + manager view). */
-export function useCourtReviews(courtIds: string[]) {
-  const key = [...courtIds].sort().join(",");
-  return useQuery({
-    enabled: courtIds.length > 0,
-    queryKey: ["court-reviews", key],
-    queryFn: async (): Promise<CourtReview[]> => {
-      const { data, error } = await supabase
-        .from("court_reviews")
-        .select(
-          "id, court_id, player_id, surface_rating, lighting_rating, crowd_rating, comment, created_at, profiles(display_name, initials)",
-        )
-        .in("court_id", courtIds)
-        .order("created_at", { ascending: false });
-      if (error) throw new Error(error.message);
-      return (data ?? []) as unknown as CourtReview[];
-    },
-  });
-}
-
-export type BookingInvite = {
-  id: string;
-  booking_id: string;
-  inviter_id: string;
-  invitee_id: string;
-  status: string;
-  bookings: {
-    id: string;
-    starts_at: string;
-    ends_at: string;
-    courts: { name: string; clubs: { name: string; location_label: string } | null } | null;
-  } | null;
-};
-
-const INVITE_SELECT =
-  "id, booking_id, inviter_id, invitee_id, status, bookings(id, starts_at, ends_at, courts(name, clubs(name, location_label)))";
-
-/** Invites the signed-in player received. */
-export function useInvitesReceived(userId: string | undefined) {
-  return useQuery({
-    enabled: Boolean(userId),
-    queryKey: ["invites-received", userId],
-    queryFn: async (): Promise<BookingInvite[]> => {
-      const { data, error } = await supabase
-        .from("booking_invites")
-        .select(INVITE_SELECT)
-        .eq("invitee_id", userId!)
-        .order("created_at", { ascending: false });
-      if (error) throw new Error(error.message);
-      return (data ?? []) as unknown as BookingInvite[];
-    },
-  });
-}
-
-/** Invites the signed-in player sent, for their own bookings. */
-export function useInvitesSent(userId: string | undefined) {
-  return useQuery({
-    enabled: Boolean(userId),
-    queryKey: ["invites-sent", userId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("booking_invites")
-        .select("id, booking_id, invitee_id, status, profiles:invitee_id(display_name, initials)")
-        .eq("inviter_id", userId!);
-      if (error) throw new Error(error.message);
-      return (data ?? []) as unknown as {
-        id: string;
-        booking_id: string;
-        invitee_id: string;
-        status: string;
-        profiles: { display_name: string; initials: string } | null;
-      }[];
-    },
-  });
-}
-
-/** A single player's public profile. */
 export function usePlayer(playerId: string | undefined) {
   return useQuery({
     enabled: Boolean(playerId),
     queryKey: ["player", playerId],
     queryFn: async (): Promise<PlayerProfile | null> => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("id, display_name, initials, level, style, avatar_url")
-        .eq("id", playerId!)
-        .maybeSingle();
+      const { data, error } = await supabase.from("profiles").select(PROFILE_SELECT).eq("id", playerId!).maybeSingle();
       if (error) throw new Error(error.message);
-      return data ? { ...data, level: Number(data.level) } : null;
+      return (data ?? null) as unknown as PlayerProfile | null;
     },
   });
 }
 
-/** Public match history for any player. */
-export function usePlayerMatches(playerId: string | undefined) {
+export type AppNotification = {
+  id: string;
+  kind: string;
+  title: string;
+  body: string;
+  link: string | null;
+  read_at: string | null;
+  created_at: string;
+};
+
+export function useNotifications(userId: string | undefined) {
   return useQuery({
-    enabled: Boolean(playerId),
-    queryKey: ["player-matches", playerId],
-    queryFn: async (): Promise<Match[]> => {
+    enabled: Boolean(userId),
+    queryKey: ["notifications", userId],
+    queryFn: async (): Promise<AppNotification[]> => {
       const { data, error } = await supabase
-        .from("matches")
-        .select("id, played_on, opponent, score, result, club_label, level_delta")
-        .eq("player_id", playerId!)
-        .order("played_on", { ascending: false });
+        .from("notifications")
+        .select("id, kind, title, body, link, read_at, created_at")
+        .eq("user_id", userId!)
+        .order("created_at", { ascending: false })
+        .limit(30);
       if (error) throw new Error(error.message);
-      return (data ?? []).map((m) => ({ ...m, level_delta: Number(m.level_delta) }));
+      return (data ?? []) as AppNotification[];
     },
   });
+}
+
+/** Win / loss / played totals derived from recorded results. */
+export function playerStats(matches: MatchRow[], userId: string) {
+  let played = 0;
+  let wins = 0;
+  let losses = 0;
+  for (const m of matches) {
+    const result = m.match_results?.[0];
+    if (!result) continue;
+    const me = m.match_players?.find((p) => p.player_id === userId);
+    if (!me) continue;
+    played += 1;
+    if (me.side === result.winner_side) wins += 1;
+    else losses += 1;
+  }
+  return { played, wins, losses };
 }

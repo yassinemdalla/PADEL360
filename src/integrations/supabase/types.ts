@@ -14,44 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      booking_invites: {
-        Row: {
-          booking_id: string
-          created_at: string
-          id: string
-          invitee_id: string
-          inviter_id: string
-          status: string
-          updated_at: string
-        }
-        Insert: {
-          booking_id: string
-          created_at?: string
-          id?: string
-          invitee_id: string
-          inviter_id: string
-          status?: string
-          updated_at?: string
-        }
-        Update: {
-          booking_id?: string
-          created_at?: string
-          id?: string
-          invitee_id?: string
-          inviter_id?: string
-          status?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "booking_invites_booking_id_fkey"
-            columns: ["booking_id"]
-            isOneToOne: false
-            referencedRelation: "bookings"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       bookings: {
         Row: {
           court_id: string
@@ -96,153 +58,83 @@ export type Database = {
       clubs: {
         Row: {
           address: string
+          city: string
           created_at: string
           description: string
           id: string
           latitude: number | null
           location_label: string
           longitude: number | null
-          manager_id: string | null
           name: string
           photo_url: string | null
           price_cents: number
         }
         Insert: {
           address?: string
+          city?: string
           created_at?: string
           description?: string
           id?: string
           latitude?: number | null
           location_label?: string
           longitude?: number | null
-          manager_id?: string | null
           name: string
           photo_url?: string | null
           price_cents?: number
         }
         Update: {
           address?: string
+          city?: string
           created_at?: string
           description?: string
           id?: string
           latitude?: number | null
           location_label?: string
           longitude?: number | null
-          manager_id?: string | null
           name?: string
           photo_url?: string | null
           price_cents?: number
         }
         Relationships: []
       }
-      court_blocks: {
-        Row: {
-          court_id: string
-          created_at: string
-          created_by: string | null
-          ends_at: string
-          id: string
-          reason: string
-          starts_at: string
-        }
-        Insert: {
-          court_id: string
-          created_at?: string
-          created_by?: string | null
-          ends_at: string
-          id?: string
-          reason?: string
-          starts_at: string
-        }
-        Update: {
-          court_id?: string
-          created_at?: string
-          created_by?: string | null
-          ends_at?: string
-          id?: string
-          reason?: string
-          starts_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "court_blocks_court_id_fkey"
-            columns: ["court_id"]
-            isOneToOne: false
-            referencedRelation: "courts"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      court_reviews: {
-        Row: {
-          comment: string
-          court_id: string
-          created_at: string
-          crowd_rating: number
-          id: string
-          lighting_rating: number
-          player_id: string
-          surface_rating: number
-          updated_at: string
-        }
-        Insert: {
-          comment?: string
-          court_id: string
-          created_at?: string
-          crowd_rating: number
-          id?: string
-          lighting_rating: number
-          player_id: string
-          surface_rating: number
-          updated_at?: string
-        }
-        Update: {
-          comment?: string
-          court_id?: string
-          created_at?: string
-          crowd_rating?: number
-          id?: string
-          lighting_rating?: number
-          player_id?: string
-          surface_rating?: number
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "court_reviews_court_id_fkey"
-            columns: ["court_id"]
-            isOneToOne: false
-            referencedRelation: "courts"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       courts: {
         Row: {
           club_id: string
+          court_type: string
           created_at: string
           description: string
           id: string
           name: string
+          open_from: number
+          open_to: number
           position: number
+          price_per_hour_cents: number
           surface: string
         }
         Insert: {
           club_id: string
+          court_type?: string
           created_at?: string
           description?: string
           id?: string
           name: string
+          open_from?: number
+          open_to?: number
           position?: number
+          price_per_hour_cents?: number
           surface?: string
         }
         Update: {
           club_id?: string
+          court_type?: string
           created_at?: string
           description?: string
           id?: string
           name?: string
+          open_from?: number
+          open_to?: number
           position?: number
+          price_per_hour_cents?: number
           surface?: string
         }
         Relationships: [
@@ -255,90 +147,215 @@ export type Database = {
           },
         ]
       }
-      matches: {
+      match_players: {
         Row: {
-          club_label: string
           created_at: string
           id: string
-          level_delta: number
-          opponent: string
-          played_on: string
+          match_id: string
           player_id: string
-          result: string
-          score: string
+          side: number | null
+          status: string
         }
         Insert: {
-          club_label?: string
           created_at?: string
           id?: string
-          level_delta?: number
-          opponent: string
-          played_on?: string
+          match_id: string
           player_id: string
-          result: string
-          score: string
+          side?: number | null
+          status?: string
         }
         Update: {
-          club_label?: string
           created_at?: string
           id?: string
-          level_delta?: number
-          opponent?: string
-          played_on?: string
+          match_id?: string
           player_id?: string
-          result?: string
-          score?: string
+          side?: number | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_players_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      match_results: {
+        Row: {
+          id: string
+          match_id: string
+          recorded_at: string
+          recorded_by: string
+          score_text: string
+          winner_side: number
+        }
+        Insert: {
+          id?: string
+          match_id: string
+          recorded_at?: string
+          recorded_by: string
+          score_text: string
+          winner_side: number
+        }
+        Update: {
+          id?: string
+          match_id?: string
+          recorded_at?: string
+          recorded_by?: string
+          score_text?: string
+          winner_side?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_results_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: true
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      matches: {
+        Row: {
+          booking_id: string | null
+          club_id: string
+          court_id: string | null
+          created_at: string
+          creator_id: string
+          ends_at: string
+          id: string
+          is_public: boolean
+          level_required: Database["public"]["Enums"]["level_tier"]
+          max_players: number
+          notes: string
+          starts_at: string
+          updated_at: string
+        }
+        Insert: {
+          booking_id?: string | null
+          club_id: string
+          court_id?: string | null
+          created_at?: string
+          creator_id: string
+          ends_at: string
+          id?: string
+          is_public?: boolean
+          level_required?: Database["public"]["Enums"]["level_tier"]
+          max_players?: number
+          notes?: string
+          starts_at: string
+          updated_at?: string
+        }
+        Update: {
+          booking_id?: string | null
+          club_id?: string
+          court_id?: string | null
+          created_at?: string
+          creator_id?: string
+          ends_at?: string
+          id?: string
+          is_public?: boolean
+          level_required?: Database["public"]["Enums"]["level_tier"]
+          max_players?: number
+          notes?: string
+          starts_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matches_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_court_id_fkey"
+            columns: ["court_id"]
+            isOneToOne: false
+            referencedRelation: "courts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          kind: string
+          link: string | null
+          read_at: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          id?: string
+          kind: string
+          link?: string | null
+          read_at?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          link?: string | null
+          read_at?: string | null
+          title?: string
+          user_id?: string
         }
         Relationships: []
       }
       profiles: {
         Row: {
           avatar_url: string | null
+          city: string
           created_at: string
           display_name: string
           id: string
           initials: string
           level: number
+          level_points: number
+          level_tier: Database["public"]["Enums"]["level_tier"]
           style: string
         }
         Insert: {
           avatar_url?: string | null
+          city?: string
           created_at?: string
           display_name?: string
           id: string
           initials?: string
           level?: number
+          level_points?: number
+          level_tier?: Database["public"]["Enums"]["level_tier"]
           style?: string
         }
         Update: {
           avatar_url?: string | null
+          city?: string
           created_at?: string
           display_name?: string
           id?: string
           initials?: string
           level?: number
+          level_points?: number
+          level_tier?: Database["public"]["Enums"]["level_tier"]
           style?: string
-        }
-        Relationships: []
-      }
-      user_roles: {
-        Row: {
-          created_at: string
-          id: string
-          role: Database["public"]["Enums"]["app_role"]
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          role: Database["public"]["Enums"]["app_role"]
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          role?: Database["public"]["Enums"]["app_role"]
-          user_id?: string
         }
         Relationships: []
       }
@@ -347,16 +364,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      has_role: {
-        Args: {
-          _role: Database["public"]["Enums"]["app_role"]
-          _user_id: string
-        }
-        Returns: boolean
-      }
+      [_ in never]: never
     }
     Enums: {
-      app_role: "player" | "club_manager"
+      level_tier:
+        | "beginner"
+        | "improver"
+        | "intermediate"
+        | "advanced"
+        | "competitor"
+        | "elite"
+        | "expert"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -484,7 +502,15 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["player", "club_manager"],
+      level_tier: [
+        "beginner",
+        "improver",
+        "intermediate",
+        "advanced",
+        "competitor",
+        "elite",
+        "expert",
+      ],
     },
   },
 } as const

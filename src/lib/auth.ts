@@ -1,16 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-
-export type AppRole = "player" | "club_manager";
+import type { LevelTier } from "./levels";
 
 export type SessionInfo = {
   userId: string;
   email: string;
   displayName: string;
   initials: string;
-  level: number;
-  style: string;
-  role: AppRole;
+  city: string;
+  tier: LevelTier;
+  points: number;
+  avatarUrl: string | null;
 };
 
 export const sessionQueryKey = ["session"] as const;
@@ -20,21 +20,23 @@ export async function fetchSession(): Promise<SessionInfo | null> {
   if (error || !data.user) return null;
 
   const user = data.user;
-  const [{ data: profile }, { data: roles }] = await Promise.all([
-    supabase.from("profiles").select("display_name, initials, level, style").eq("id", user.id).maybeSingle(),
-    supabase.from("user_roles").select("role").eq("user_id", user.id),
-  ]);
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("display_name, initials, city, level_tier, level_points, avatar_url")
+    .eq("id", user.id)
+    .maybeSingle();
 
-  const role: AppRole = roles?.some((r) => r.role === "club_manager") ? "club_manager" : "player";
+  const fallbackName = user.email?.split("@")[0] ?? "Player";
 
   return {
     userId: user.id,
     email: user.email ?? "",
-    displayName: profile?.display_name ?? user.email?.split("@")[0] ?? "Player",
-    initials: profile?.initials ?? "PB",
-    level: Number(profile?.level ?? 3),
-    style: profile?.style ?? "Baseline",
-    role,
+    displayName: profile?.display_name ?? fallbackName,
+    initials: (profile?.initials ?? fallbackName.slice(0, 2)).toUpperCase(),
+    city: profile?.city ?? "Sousse",
+    tier: (profile?.level_tier ?? "intermediate") as LevelTier,
+    points: Number(profile?.level_points ?? 0),
+    avatarUrl: profile?.avatar_url ?? null,
   };
 }
 

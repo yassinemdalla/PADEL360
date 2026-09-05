@@ -214,7 +214,9 @@ export const recordResult = createServerFn({ method: "POST" })
 
     const players = (match.match_players ?? []) as { player_id: string; side: number | null }[];
     if (!players.some((p) => p.player_id === userId)) throw new Error("Only players in this match can record it.");
-    if ((match.match_results ?? []).length > 0) throw new Error("This match already has a result.");
+    const existing = (match.match_results ?? []) as unknown as { match_id: string }[];
+    if (existing.length > 0) throw new Error("This match already has a result.");
+
 
     const { error: insertError } = await supabase.from("match_results").insert({
       match_id: match.id,

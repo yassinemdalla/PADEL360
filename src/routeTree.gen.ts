@@ -12,13 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AuthenticatedClubRouteImport } from './routes/_authenticated/club'
-import { Route as AuthenticatedCourtsRouteImport } from './routes/_authenticated/courts'
-import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
-import { Route as AuthenticatedManagerRouteImport } from './routes/_authenticated/manager'
-import { Route as AuthenticatedMatchesRouteImport } from './routes/_authenticated/matches'
-import { Route as AuthenticatedPlayersRouteImport } from './routes/_authenticated/players'
-import { Route as AuthenticatedClubsClubIdRouteImport } from './routes/_authenticated/clubs.$clubId'
+import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -34,113 +28,35 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedClubRoute = AuthenticatedClubRouteImport.update({
-  id: '/club',
-  path: '/club',
+const AuthenticatedHomeRoute = AuthenticatedHomeRouteImport.update({
+  id: '/home',
+  path: '/home',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedCourtsRoute = AuthenticatedCourtsRouteImport.update({
-  id: '/courts',
-  path: '/courts',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedManagerRoute = AuthenticatedManagerRouteImport.update({
-  id: '/manager',
-  path: '/manager',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedMatchesRoute = AuthenticatedMatchesRouteImport.update({
-  id: '/matches',
-  path: '/matches',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedPlayersRoute = AuthenticatedPlayersRouteImport.update({
-  id: '/players',
-  path: '/players',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedClubsClubIdRoute =
-  AuthenticatedClubsClubIdRouteImport.update({
-    id: '/clubs/$clubId',
-    path: '/clubs/$clubId',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/club': typeof AuthenticatedClubRoute
-  '/courts': typeof AuthenticatedCourtsRoute
-  '/dashboard': typeof AuthenticatedDashboardRoute
-  '/manager': typeof AuthenticatedManagerRoute
-  '/matches': typeof AuthenticatedMatchesRoute
-  '/players': typeof AuthenticatedPlayersRoute
-  '/clubs/$clubId': typeof AuthenticatedClubsClubIdRoute
+  '/home': typeof AuthenticatedHomeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/club': typeof AuthenticatedClubRoute
-  '/courts': typeof AuthenticatedCourtsRoute
-  '/dashboard': typeof AuthenticatedDashboardRoute
-  '/manager': typeof AuthenticatedManagerRoute
-  '/matches': typeof AuthenticatedMatchesRoute
-  '/players': typeof AuthenticatedPlayersRoute
-  '/clubs/$clubId': typeof AuthenticatedClubsClubIdRoute
+  '/home': typeof AuthenticatedHomeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
-  '/_authenticated/club': typeof AuthenticatedClubRoute
-  '/_authenticated/courts': typeof AuthenticatedCourtsRoute
-  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
-  '/_authenticated/manager': typeof AuthenticatedManagerRoute
-  '/_authenticated/matches': typeof AuthenticatedMatchesRoute
-  '/_authenticated/players': typeof AuthenticatedPlayersRoute
-  '/_authenticated/clubs/$clubId': typeof AuthenticatedClubsClubIdRoute
+  '/_authenticated/home': typeof AuthenticatedHomeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/auth'
-    | '/club'
-    | '/courts'
-    | '/dashboard'
-    | '/manager'
-    | '/matches'
-    | '/players'
-    | '/clubs/$clubId'
+  fullPaths: '/' | '/auth' | '/home'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/auth'
-    | '/club'
-    | '/courts'
-    | '/dashboard'
-    | '/manager'
-    | '/matches'
-    | '/players'
-    | '/clubs/$clubId'
-  id:
-    | '__root__'
-    | '/'
-    | '/_authenticated'
-    | '/auth'
-    | '/_authenticated/club'
-    | '/_authenticated/courts'
-    | '/_authenticated/dashboard'
-    | '/_authenticated/manager'
-    | '/_authenticated/matches'
-    | '/_authenticated/players'
-    | '/_authenticated/clubs/$clubId'
+  to: '/' | '/auth' | '/home'
+  id: '__root__' | '/' | '/_authenticated' | '/auth' | '/_authenticated/home'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -172,76 +88,22 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/club': {
-      id: '/_authenticated/club'
-      path: '/club'
-      fullPath: '/club'
-      preLoaderRoute: typeof AuthenticatedClubRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/courts': {
-      id: '/_authenticated/courts'
-      path: '/courts'
-      fullPath: '/courts'
-      preLoaderRoute: typeof AuthenticatedCourtsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboard': {
-      id: '/_authenticated/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/manager': {
-      id: '/_authenticated/manager'
-      path: '/manager'
-      fullPath: '/manager'
-      preLoaderRoute: typeof AuthenticatedManagerRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/matches': {
-      id: '/_authenticated/matches'
-      path: '/matches'
-      fullPath: '/matches'
-      preLoaderRoute: typeof AuthenticatedMatchesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/players': {
-      id: '/_authenticated/players'
-      path: '/players'
-      fullPath: '/players'
-      preLoaderRoute: typeof AuthenticatedPlayersRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/clubs/$clubId': {
-      id: '/_authenticated/clubs/$clubId'
-      path: '/clubs/$clubId'
-      fullPath: '/clubs/$clubId'
-      preLoaderRoute: typeof AuthenticatedClubsClubIdRouteImport
+    '/_authenticated/home': {
+      id: '/_authenticated/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof AuthenticatedHomeRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedClubRoute: typeof AuthenticatedClubRoute
-  AuthenticatedCourtsRoute: typeof AuthenticatedCourtsRoute
-  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
-  AuthenticatedManagerRoute: typeof AuthenticatedManagerRoute
-  AuthenticatedMatchesRoute: typeof AuthenticatedMatchesRoute
-  AuthenticatedPlayersRoute: typeof AuthenticatedPlayersRoute
-  AuthenticatedClubsClubIdRoute: typeof AuthenticatedClubsClubIdRoute
+  AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedClubRoute: AuthenticatedClubRoute,
-  AuthenticatedCourtsRoute: AuthenticatedCourtsRoute,
-  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
-  AuthenticatedManagerRoute: AuthenticatedManagerRoute,
-  AuthenticatedMatchesRoute: AuthenticatedMatchesRoute,
-  AuthenticatedPlayersRoute: AuthenticatedPlayersRoute,
-  AuthenticatedClubsClubIdRoute: AuthenticatedClubsClubIdRoute,
+  AuthenticatedHomeRoute: AuthenticatedHomeRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
